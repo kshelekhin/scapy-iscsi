@@ -1,0 +1,17 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "scapy-iscsi"
+version = "0.1.0"
+authors = [
+    { name = "Daria Bukharina", email = "d.bukharina@yadro.com" },
+    { name = "Konstantin Shelekhin", email = "k.shelekhin@yadro.com" },
+]
+description = "iSCSI layer for Scapy"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "scapy ~=2.5.0",
+]
