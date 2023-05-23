@@ -451,7 +451,7 @@ class CDB(Packet):
 
 
 class READ16(Packet):
-    name = "SCSI READ (16)"
+    name = "SCSI READ(16)"
 
     fields_desc = [
         XBitField("rdprotect", 0x0, 3),
@@ -465,7 +465,7 @@ class READ16(Packet):
 
 
 class WRITE16(Packet):
-    name = "SCSI WRITE (16)"
+    name = "SCSI WRITE(16)"
 
     fields_desc = [
         XBitField("wrprotect", 0x0, 3),
