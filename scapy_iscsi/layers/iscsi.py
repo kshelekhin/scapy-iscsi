@@ -403,11 +403,35 @@ class Reject(Packet):
         return 1
 
 
+class R2T(Packet):
+    name = "iSCSI R2T"
+
+    fields_desc = [
+        FlagsField("flags", 0x01, 1, "F"),
+        XBitField("reserved", 0x0, 23),
+        BitField("ahs_len", 0, 8),
+        BitFieldLenField("ds_len", None, 24, length_of="ds"),
+        XBitField("lun", 0, 64),
+        XBitField("itt", 0x0, 32),
+        XBitField("ttt", 0x0, 32),
+        XBitField("statsn", 0x0, 32),
+        XBitField("expcmdsn", 0x0, 32),
+        XBitField("maxcmdsn", 0x0, 32),
+        XBitField("r2tsn", 0x0, 32),
+        XBitField("offset", 0x0, 32),
+        XBitField("ddtl", 0x0, 32),
+    ]
+
+    def answers(self, other):
+        return 1
+
+
 bind_layers(ISCSI, NopIn, opcode=0x20)
 bind_layers(ISCSI, SCSIResponse, opcode=0x21)
 bind_layers(ISCSI, TMFResponse, opcode=0x22)
 bind_layers(ISCSI, LoginResponse, opcode=0x23)
 bind_layers(ISCSI, DataIn, opcode=0x25)
+bind_layers(ISCSI, R2T, opcode=0x31)
 bind_layers(ISCSI, Reject, opcode=0x3F)
 
 
