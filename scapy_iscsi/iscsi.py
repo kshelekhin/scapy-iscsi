@@ -229,8 +229,9 @@ class DataOut(Packet):
     ]
 
     def answers(self, other):
-        # TODO: Check RFC
-        return 0
+        if self.ttt == 0xFFFFFFFF:
+            return 0
+        return 1
 
 
 bind_layers(ISCSI, NopOut, opcode=0x00)
