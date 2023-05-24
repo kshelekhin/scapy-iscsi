@@ -12,5 +12,5 @@ $ . venv/bin/activate
 $ pip install -e .
 ```
 
-Now you're good to go. Get a look at examples/ to get the idea on how to use
+Now you're good to go. Take a look at examples/ to get the idea on how to use
 this library.
