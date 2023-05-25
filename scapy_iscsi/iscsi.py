@@ -42,6 +42,19 @@ SERVICE_RESPONSES = {
     0x01: "target-failure",
 }
 
+LOGOUT_REASONS = {
+    0x00: "close-session",
+    0x01: "close-connection",
+    0x02: "recover-connection",
+}
+
+LOGOUT_RESPONSES = {
+    0x00: "closed",
+    0x01: "cid-not-found",
+    0x02: "recovery-not-supported",
+    0x03: "cleanup-failed",
+}
+
 SCSI_STATUS_CODES = {
     0x00: "good",
     0x02: "check-condition",
@@ -234,11 +247,34 @@ class DataOut(Packet):
         return 1
 
 
+class LogoutRequest(Packet):
+    name = "iSCSI Logout Request"
+
+    fields_desc = [
+        FlagsField("flags", 0x1, 1, "F"),
+        BitEnumField("reason", 0x00, 7, LOGOUT_REASONS),
+        XBitField("reserved1", 0x0, 16),
+        BitField("ahs_len", 0, 8),
+        BitField("ds_len", 0, 24),
+        XBitField("reserved2", 0x0, 64),
+        XBitField("itt", 0x0, 32),
+        XBitField("cid", 0x0, 16),
+        XBitField("reserved3", 0x0, 16),
+        XBitField("cmdsn", 0x0, 32),
+        XBitField("expstatsn", 0x0, 32),
+        XBitField("reserved4", 0x0, 128),
+    ]
+
+    def answers(self, other):
+        return 0
+
+
 bind_layers(ISCSI, NopOut, opcode=0x00)
 bind_layers(ISCSI, SCSICommand, opcode=0x01)
 bind_layers(ISCSI, TMFRequest, opcode=0x02)
 bind_layers(ISCSI, LoginRequest, immediate=1, opcode=0x03)
 bind_layers(ISCSI, DataOut, opcode=0x05)
+bind_layers(ISCSI, LogoutRequest, opcode=0x06)
 
 #
 # Target Opcodes
@@ -377,6 +413,32 @@ class DataIn(Packet):
         return 1
 
 
+class LogoutResponse(Packet):
+    name = "iSCSI Logout Response"
+
+    fields_desc = [
+        FlagsField("flags", 0x01, 1, "F"),
+        XBitField("reserved1", 0x0, 7),
+        BitEnumField("response", 0x0, 8, LOGOUT_RESPONSES),
+        BitField("reserved2", 0, 8),
+        BitField("ahs_len", 0, 8),
+        BitField("ds_len", 0, 24),
+        XBitField("reserved3", 0x0, 64),
+        XBitField("itt", 0x0, 32),
+        XBitField("reserved4", 0x0, 32),
+        XBitField("statsn", 0x0, 32),
+        XBitField("expcmdsn", 0x0, 32),
+        XBitField("maxcmdsn", 0x0, 32),
+        XBitField("reserved5", 0x0, 32),
+        XBitField("time2wait", 0x0, 16),
+        XBitField("time2retain", 0x0, 16),
+        XBitField("reserved6", 0x0, 32),
+    ]
+
+    def answers(self, other):
+        return 1
+
+
 class Reject(Packet):
     name = "iSCSI Reject"
 
@@ -432,6 +494,7 @@ bind_layers(ISCSI, SCSIResponse, opcode=0x21)
 bind_layers(ISCSI, TMFResponse, opcode=0x22)
 bind_layers(ISCSI, LoginResponse, opcode=0x23)
 bind_layers(ISCSI, DataIn, opcode=0x25)
+bind_layers(ISCSI, LogoutResponse, opcode=0x26)
 bind_layers(ISCSI, R2T, opcode=0x31)
 bind_layers(ISCSI, Reject, opcode=0x3F)
 

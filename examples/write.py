@@ -45,3 +45,6 @@ wrq = ISCSI() / SCSICommand(flags="WF", itt=0x1, cmdsn=lirs.expcmdsn, edtl=edtl,
 r2t = s.sr1(wrq)
 dto = ISCSI() / DataOut(itt=0x1, ttt=r2t.ttt, offset=r2t.offset, ds=chunk2)
 wrs = s.sr1(dto)
+
+lorq = ISCSI() / LogoutRequest(itt=0x2, cmdsn=wrs.expcmdsn)
+lors = s.sr1(lorq)
