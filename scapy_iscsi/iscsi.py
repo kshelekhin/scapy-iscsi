@@ -160,7 +160,7 @@ class SCSICommand(Packet):
         BitField("edtl", 0, 32),
         XBitField("cmdsn", 0x0, 32),
         XBitField("expstatsn", 0x0, 32),
-        PacketField("cdb", None, Packet),
+        PadField(PacketField("cdb", None, Packet), 16),
         PacketField("ahs", None, Packet),
         # PacketField("hdr_digest", None, Packet),
         PadField(StrLenField("ds", None, length_from=lambda pkt: pkt.ds_len), 4),
