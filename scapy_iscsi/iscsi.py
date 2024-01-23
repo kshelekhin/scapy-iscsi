@@ -542,5 +542,33 @@ class WRITE16(Packet):
     ]
 
 
+class RESERVE(Packet):
+    name = "SCSI RESERVE"
+    fields_desc = [
+        XBitField("lun", 0x0, 3),
+        XBitField("3rdpty", 0x0, 1),
+        XBitField("3rdpty_device_id", 0x0, 3),
+        XBitField("extent", 0x0, 1),
+        XBitField("reservation_id", 0x0, 8),
+        XBitField("extent_list_len", 0x0, 16),
+        XBitField("control", 0x0, 8),
+    ]
+
+
+class RELEASE(Packet):
+    name = "SCSI RELEASE"
+    fields_desc = [
+        XBitField("lun", 0x0, 3),
+        XBitField("3rdpty", 0x0, 1),
+        XBitField("3rdpty_device_id", 0x0, 3),
+        XBitField("extent", 0x0, 1),
+        XBitField("reservation_id", 0x0, 8),
+        XBitField("reserved", 0x0, 8),
+        XBitField("control", 0x0, 8),
+    ]
+
+
 bind_layers(CDB, READ16, opcode=0x88)
+bind_layers(CDB, RELEASE, opcodes=0x17)
+bind_layers(CDB, RESERVE, opcodes=0x16)
 bind_layers(CDB, WRITE16, opcode=0x8A)
