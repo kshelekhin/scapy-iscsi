@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
-# This example shows how to write data with WRITE(16)
+# This example shows how to write data with WRITE(16) and also includes RESERVE and RELEASE commands.
 
 import sys
-
 from scapy.supersocket import StreamSocket
 from scapy_iscsi.iscsi import *
 
@@ -30,22 +29,17 @@ s = socket.socket()
 s.connect((sys.argv[1], 3260))
 s = StreamSocket(s, ISCSI)
 
+# Login
 lirq = ISCSI() / LoginRequest(isid=0xB00B, ds=kv2text(proposed_params))
 lirs = s.sr1(lirq)
 
-negotiated = (text2kv(lirs.ds))
-chunk1 = b"A" * int(negotiated["FirstBurstLength"])
-chunk2 = b"B" * int(negotiated["MaxRecvDataSegmentLength"])
-edtl = len(chunk1) + len(chunk2)
-nr_blocks = int(edtl / 512)
-cdb = CDB() / WRITE16(xfer_len=nr_blocks)
+negotiated = text2kv(lirs.ds)
 
-wrq = ISCSI() / SCSICommand(flags="WF", itt=0x1, cmdsn=lirs.expcmdsn,
-                            edtl=edtl, cdb=cdb, ds=chunk1, lun=0x0001000000000000)
-r2t = s.sr1(wrq)
+cdb = CDB() / RELEASE(lun=0x0001000000000000)
 
-dto = ISCSI() / DataOut(itt=0x1, ttt=r2t.ttt, offset=r2t.offset, ds=chunk2)
-wrs = s.sr1(dto)
+wrq = ISCSI() / SCSICommand(flags="F", itt=0x1, cmdsn=lirs.expcmdsn, cdb=cdb, lun=0x0001000000000000)
+reserve = s.sr1(wrq)
 
-lorq = ISCSI() / LogoutRequest(itt=0x2, cmdsn=wrs.expcmdsn)
+# Logout
+lorq = ISCSI() / LogoutRequest(itt=0x2, cmdsn=reserve.expcmdsn)
 lors = s.sr1(lorq)
