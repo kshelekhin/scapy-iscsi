@@ -544,10 +544,11 @@ class WRITE16(Packet):
 
 class RESERVE(Packet):
     name = "SCSI RESERVE"
+
     fields_desc = [
         XBitField("lun", 0x0, 3),
-        XBitField("3rdpty", 0x0, 1),
-        XBitField("3rdpty_device_id", 0x0, 3),
+        XBitField("third_party", 0x0, 1),
+        XBitField("dev_id", 0x0, 3),
         XBitField("extent", 0x0, 1),
         XBitField("reservation_id", 0x0, 8),
         XBitField("extent_list_len", 0x0, 16),
@@ -557,10 +558,11 @@ class RESERVE(Packet):
 
 class RELEASE(Packet):
     name = "SCSI RELEASE"
+
     fields_desc = [
         XBitField("lun", 0x0, 3),
-        XBitField("3rdpty", 0x0, 1),
-        XBitField("3rdpty_device_id", 0x0, 3),
+        XBitField("third_party", 0x0, 1),
+        XBitField("dev_id", 0x0, 3),
         XBitField("extent", 0x0, 1),
         XBitField("reservation_id", 0x0, 8),
         XBitField("reserved", 0x0, 8),
