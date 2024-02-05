@@ -1,0 +1,27 @@
+name: Pre-merge checks
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+  pytest:
+    strategy:
+      matrix:
+        python_version: ['3.6', '3.7',  '3.8', '3.9', '3.10', '3.11']
+    runs-on: ubuntu-latest
+    container: python:${{ matrix.python_version }}
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+
+      - name: Create virtual environment
+        run: python -m venv venv
+
+      - name: Install python dependencies
+        run: |
+          ./venv/bin/pip install -e .
+          ./venv/bin/pip install pytest
+
+      - name: Run pytest
+        run: ./venv/bin/pytest -v tests
