@@ -15,13 +15,8 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Create virtual environment
-        run: python -m venv venv
-
-      - name: Install python dependencies
-        run: |
-          ./venv/bin/pip install -e .
-          ./venv/bin/pip install pytest
+      - name: Install dependencies
+        run: pip install -e . pycodestyle pytest
 
       - name: Run pytest
-        run: ./venv/bin/pytest -v tests
+        run: make test
