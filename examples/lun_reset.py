@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# This example shows how to make LUN Reset.
+# This example shows how to make LUN RESET
 
 import sys
 
@@ -23,15 +23,13 @@ proposed_params = {
 }
 
 if len(sys.argv) != 2:
-    print("usage: write.py <host>", file=sys.stderr)
+    print("usage: lun_reset.py <host>", file=sys.stderr)
     exit(1)
 
-# установка соединения с удаленным iSCSI таргетом
 s = socket.socket()
 s.connect((sys.argv[1], 3260))
 s = StreamSocket(s, ISCSI)
 
-# отправка запроса на логин
 lirq = ISCSI() / LoginRequest(isid=0xB00B, ds=kv2text(proposed_params))
 lirs = s.sr1(lirq)
 
