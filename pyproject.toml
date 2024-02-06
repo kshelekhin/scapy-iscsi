@@ -15,3 +15,9 @@ requires-python = ">=3.6"
 dependencies = [
     "scapy ~=2.5.0",
 ]
+
+[project.optional-dependencies]
+development = [
+    "pycodestyle ~=2.10.0",
+    "pytest ~=7.0.1",
+]

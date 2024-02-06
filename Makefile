@@ -1,6 +1,6 @@
 venv:
 	python -m venv venv
-	./venv/bin/pip install -e . pycodestyle pytest
+	./venv/bin/pip install -e '.[development]'
 
 checks: test stylecheck
 
