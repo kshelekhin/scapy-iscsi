@@ -1,5 +1,6 @@
 from scapy_iscsi.iscsi import *
 
+
 def test_build_login_request():
     login_parameters = {
         "InitiatorName": "iqn.2023-01.com.example:initiator",
@@ -18,11 +19,12 @@ def test_build_login_request():
     }
     pdu = ISCSI() / LoginRequest(ds=kv2text(login_parameters))
     with open("tests/pdu/login-request", 'br') as f:
-       assert(f.read() == pdu.build())
+        assert f.read() == pdu.build()
+
 
 def test_build_scsi_command():
     cdb = CDB() / WRITE16(xfer_len=1)
     pdu = ISCSI() / SCSICommand(flags="WF", itt=0x1, cmdsn=0x1, edtl=512,
                                 cdb=cdb, ds=(b'A' * 512))
     with open("tests/pdu/write16", 'br') as f:
-       assert(f.read() == pdu.build())
+        assert f.read() == pdu.build()
