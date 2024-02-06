@@ -14,4 +14,7 @@ setup(
     install_requires=[
         'scapy ~=2.5.0',
     ],
+    extras_require={
+        'development': ['pycodestyle ~=2.10.0', 'pytest ~=7.0.1'],
+    },
 )

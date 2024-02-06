@@ -7,10 +7,17 @@ iSCSI layer for Scapy.
 To start hacking do the following:
 
 ```
-$ python -m venv venv
+$ make venv
 $ . venv/bin/activate
-$ pip install -e .
 ```
 
-Now you're good to go. Take a look at examples/ to get the idea on how to use
-this library.
+Take a look at examples/ to get the idea on how to use this library.
+
+## Testing
+
+Run the following commands to ensure that your changes are correct:
+
+```
+$ . venv/bin/activate
+$ make checks
+```
