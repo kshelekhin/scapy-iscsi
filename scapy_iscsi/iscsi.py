@@ -570,6 +570,22 @@ class RELEASE(Packet):
     ]
 
 
+class COMPARE_AND_WRITE(Packet):
+    name = "SCSI COMPARE AND WRITE"
+
+    fields_desc = [
+        XBitField("wrprotect", 0x0, 3),
+        FlagsField("flags", 0x0, 5, ["BIT0", "BIT1", "BIT2", "FUA", "DPO"]),
+        XBitField("lba", 0x0, 64),
+        XBitField("reserved", 0x0, 24),
+        XBitField("xfer_len", 0x0, 8),
+        XBitField("reserved2", 0x0, 3),
+        XBitField("group_number", 0x0, 5),
+        XBitField("control", 0x0, 8),
+    ]
+
+
+bind_layers(CDB, COMPARE_AND_WRITE, opcode=0x89)
 bind_layers(CDB, READ16, opcode=0x88)
 bind_layers(CDB, RELEASE, opcodes=0x17)
 bind_layers(CDB, RESERVE, opcodes=0x16)
