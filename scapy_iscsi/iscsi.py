@@ -5,6 +5,7 @@
 """
 iSCSI (Internet Small Computer System Interface).
 """
+import enum
 
 from scapy.fields import *
 from scapy.packet import Packet, bind_layers
@@ -90,6 +91,34 @@ TMF_RESPONSES = {
     0x05: "not-supported",
     0x06: "authorization-failed",
     0xFF: "rejected",
+}
+
+PR_IN_SA = {
+    0x00: "read_keys",
+    0x01: "read_reservation",
+    0x02: "report_capabilities",
+    0x03: "read_full_status"
+}
+
+PR_OUT_SA = {
+    0x00: "register",
+    0x01: "reserve",
+    0x02: "release",
+    0x03: "clear",
+    0x04: "preempt",
+    0x05: "preempt_and_abort",
+    0x06: "register_and_ignore_existing_key",
+    0x07: "register_and_move",
+    0x08: "replace_lost_reservation"
+}
+
+PR_OUT_TYPE = {
+    0x01: "write_excl",
+    0x03: "excl_access",
+    0x05: "write_excl_registrants_only",
+    0x06: "excl_access_registrants_only",
+    0x07: "write_excl_all_registrants",
+    0x08: "excl_access_all_registrants"
 }
 
 
@@ -570,7 +599,66 @@ class RELEASE(Packet):
     ]
 
 
+class COMPARE_AND_WRITE(Packet):
+    name = "SCSI COMPARE AND WRITE"
+
+    fields_desc = [
+        XBitField("wrprotect", 0x0, 3),
+        FlagsField("flags", 0x0, 5, ["BIT0", "BIT1", "BIT2", "FUA", "DPO"]),
+        XBitField("lba", 0x0, 64),
+        XBitField("reserved", 0x0, 24),
+        XBitField("xfer_len", 0x0, 8),
+        XBitField("reserved2", 0x0, 3),
+        XBitField("group_number", 0x0, 5),
+        XBitField("control", 0x0, 8),
+    ]
+
+
+class PR_IN(Packet):
+    name = "SCSI PERSISTENT RESERVE IN"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 3),
+        BitEnumField("sa", 0x0, 5, PR_IN_SA),
+        XBitField("reserved2", 0x0, 40),
+        XBitField("allocation_len", 0x2000, 16),
+        XBitField("control", 0x0, 8)
+    ]
+
+
+class PR_OUT(Packet):
+    name = "SCSI PERSISTENT RESERVE OUT"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 3),
+        BitEnumField("sa", 0x0, 5, PR_OUT_SA),
+        XBitField("scope", 0x0, 4),
+        BitEnumField("type", 0x0, 4, PR_OUT_TYPE),
+        XBitField("reserved2", 0x0, 16),
+        XBitField("param_list_len", 0x18, 32),
+        XBitField("control", 0x0, 8)
+    ]
+
+
+class PR_OUT_PARAMS(Packet):
+    name = "SCSI PERSISTENT RESERVE OUT PARAMETER LIST"
+
+    fields_desc = [
+        XBitField("res_key", 0x0, 64),
+        XBitField("sa_res_key", 0x0, 64),
+        XBitField("obsolete", 0x0, 32),
+        XBitField("reserved", 0x0, 4),
+        FlagsField("flags", 0x0, 4, ["APTPL", "BIT0", "ALL_TG_PT", "SPEC_I_PT"]),
+        XBitField("reserved2", 0x0, 8),
+        XBitField("obsolete2", 0x0, 8),
+        XBitField("additional", 0x0, 8)
+    ]
+
+
+bind_layers(CDB, COMPARE_AND_WRITE, opcode=0x89)
 bind_layers(CDB, READ16, opcode=0x88)
 bind_layers(CDB, RELEASE, opcodes=0x17)
 bind_layers(CDB, RESERVE, opcodes=0x16)
 bind_layers(CDB, WRITE16, opcode=0x8A)
+bind_layers(CDB, PR_IN, opcode=0x5E)
+bind_layers(CDB, PR_OUT, opcode=0x5F)
