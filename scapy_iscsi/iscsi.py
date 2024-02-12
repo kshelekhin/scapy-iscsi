@@ -92,6 +92,34 @@ TMF_RESPONSES = {
     0xFF: "rejected",
 }
 
+PR_IN_SA = {
+    0x00: "read-keys",
+    0x01: "read-reservation",
+    0x02: "report-capabilities",
+    0x03: "read-full-status"
+}
+
+PR_OUT_SA = {
+    0x00: "register",
+    0x01: "reserve",
+    0x02: "release",
+    0x03: "clear",
+    0x04: "preempt",
+    0x05: "preemp-and-abort",
+    0x06: "register-and-ignore-existing-key",
+    0x07: "register-and-move",
+    0x08: "replace-lost-reservation"
+}
+
+PR_OUT_TYPE = {
+    0x01: "wr-ex",
+    0x03: "ex-ac",
+    0x05: "wr-ex-ro",
+    0x06: "ex-ac-ro",
+    0x07: "wr-ex-ar",
+    0x08: "ex-ac-ar"
+}
+
 
 def kv2text(kv):
     return "\x00".join([x[0] + "=" + str(x[1]) for x in list(kv.items())]) + "\x00"
@@ -598,9 +626,52 @@ class INQUIRY(Packet):
     ]
 
 
+class PR_IN(Packet):
+    name = "SCSI PERSISTENT RESERVE IN"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 3),
+        BitEnumField("sa", 0x0, 5, PR_IN_SA),
+        XBitField("reserved2", 0x0, 40),
+        XBitField("alloc_len", 0x2000, 16),
+        XBitField("control", 0x0, 8)
+    ]
+
+
+class PR_OUT(Packet):
+    name = "SCSI PERSISTENT RESERVE OUT"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 3),
+        BitEnumField("sa", 0x0, 5, PR_OUT_SA),
+        XBitField("scope", 0x0, 4),
+        BitEnumField("type", 0x0, 4, PR_OUT_TYPE),
+        XBitField("reserved2", 0x0, 16),
+        XBitField("param_list_len", 0x18, 32),
+        XBitField("control", 0x0, 8)
+    ]
+
+
+class PR_OUT_PARAMS(Packet):
+    name = "SCSI PERSISTENT RESERVE OUT PARAMETER LIST"
+
+    fields_desc = [
+        XBitField("res_key", 0x0, 64),
+        XBitField("sa_res_key", 0x0, 64),
+        XBitField("obsolete", 0x0, 32),
+        XBitField("reserved", 0x0, 4),
+        FlagsField("flags", 0x0, 4, ["APTPL", "BIT0", "ALL_TG_PT", "SPEC_I_PT"]),
+        XBitField("reserved2", 0x0, 8),
+        XBitField("obsolete2", 0x0, 8),
+        XBitField("additional", 0x0, 8)
+    ]
+
+
 bind_layers(CDB, COMPARE_AND_WRITE, opcode=0x89)
 bind_layers(CDB, INQUIRY, opcode=0x12)
 bind_layers(CDB, READ16, opcode=0x88)
 bind_layers(CDB, RELEASE, opcodes=0x17)
 bind_layers(CDB, RESERVE, opcodes=0x16)
 bind_layers(CDB, WRITE16, opcode=0x8A)
+bind_layers(CDB, PR_IN, opcode=0x5E)
+bind_layers(CDB, PR_OUT, opcode=0x5F)
