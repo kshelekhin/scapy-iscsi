@@ -585,7 +585,21 @@ class COMPARE_AND_WRITE(Packet):
     ]
 
 
+class INQUIRY(Packet):
+    name = "SCSI INQUIRY"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 6),
+        XBitField("obsolete", 0x0, 1),
+        XBitField("evpd", 0x0, 1),
+        XBitField("pc", 0x0, 8),
+        XBitField("alloc_len", 0x0, 16),
+        XBitField("control", 0x0, 8),
+    ]
+
+
 bind_layers(CDB, COMPARE_AND_WRITE, opcode=0x89)
+bind_layers(CDB, INQUIRY, opcode=0x12)
 bind_layers(CDB, READ16, opcode=0x88)
 bind_layers(CDB, RELEASE, opcodes=0x17)
 bind_layers(CDB, RESERVE, opcodes=0x16)
