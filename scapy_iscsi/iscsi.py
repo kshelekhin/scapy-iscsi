@@ -221,6 +221,27 @@ class LoginRequest(Packet):
         return 0
 
 
+class TextRequest(Packet):
+    name = "iSCSI Text Request"
+
+    fields_desc = [
+        FlagsField("flags", 0x2, 2, "FC"),
+        XBitField("reserved1", 0x0, 22),
+        BitField("ahs_len", 0, 8),
+        BitFieldLenField("ds_len", None, 24, length_of="ds"),
+        XBitField("lun", 0x0, 64),
+        XBitField("itt", 0, 32),
+        XBitField("ttt", 0xffffffff, 32),
+        XBitField("cmdsn", 0x1, 32),
+        XBitField("expstatsn", 0x1, 32),
+        XBitField("reserved2", 0, 128),
+        PadField(StrLenField("ds", None, length_from=lambda pkt: pkt.ds_len), 4),
+    ]
+
+    def answers(self, other):
+        return 0
+
+
 class DataOut(Packet):
     name = "iSCSI Data-Out"
 
@@ -273,6 +294,7 @@ bind_layers(ISCSI, NopOut, opcode=0x00)
 bind_layers(ISCSI, SCSICommand, opcode=0x01)
 bind_layers(ISCSI, TMFRequest, opcode=0x02)
 bind_layers(ISCSI, LoginRequest, immediate=1, opcode=0x03)
+bind_layers(ISCSI, TextRequest, opcode=0x04)
 bind_layers(ISCSI, DataOut, opcode=0x05)
 bind_layers(ISCSI, LogoutRequest, opcode=0x06)
 
@@ -378,6 +400,28 @@ class LoginResponse(Packet):
         XBitField("status_class", 0x0, 8),
         XBitField("status_detail", 0x0, 8),
         XBitField("reserved3", 0, 80),
+        PadField(StrLenField("ds", None, length_from=lambda pkt: pkt.ds_len), 4),
+    ]
+
+    def answers(self, other):
+        return 1
+
+
+class TextResponse(Packet):
+    name = "iSCSI Text Response"
+
+    fields_desc = [
+        FlagsField("flags", 0x2, 2, "FC"),
+        XBitField("reserved1", 0x0, 22),
+        BitField("ahs_len", 0, 8),
+        BitFieldLenField("ds_len", None, 24, length_of="ds"),
+        XBitField("lun", 0x0, 64),
+        XBitField("itt", 0, 32),
+        XBitField("ttt", 0xffffffff, 32),
+        XBitField("statsn", 0x0, 32),
+        XBitField("expcmdsn", 0x0, 32),
+        XBitField("maxcmdsn", 0x0, 32),
+        BitField("reserved2", 0, 96),
         PadField(StrLenField("ds", None, length_from=lambda pkt: pkt.ds_len), 4),
     ]
 
@@ -493,6 +537,7 @@ bind_layers(ISCSI, NopIn, opcode=0x20)
 bind_layers(ISCSI, SCSIResponse, opcode=0x21)
 bind_layers(ISCSI, TMFResponse, opcode=0x22)
 bind_layers(ISCSI, LoginResponse, opcode=0x23)
+bind_layers(ISCSI, TextResponse, opcode=0x24)
 bind_layers(ISCSI, DataIn, opcode=0x25)
 bind_layers(ISCSI, LogoutResponse, opcode=0x26)
 bind_layers(ISCSI, R2T, opcode=0x31)
