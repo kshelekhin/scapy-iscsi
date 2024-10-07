@@ -738,6 +738,23 @@ class UNMAP(Packet):
     ]
 
 
+class RSOC(Packet):
+    name = "SCSI REPORT SUPPORTED OPERATION CODES"
+
+    fields_desc = [
+        XBitField("reserved", 0x0, 3),
+        XBitField("sa", 0x0, 5),
+        XBitField("rctd", 0x0, 1),
+        XBitField("reserved1", 0x0, 4),
+        XBitField("reporting_options", 0x0, 3),
+        XBitField("requested_op_code", 0x0, 8),
+        XBitField("requested_sa", 0x0, 16),
+        XBitField("alloc_len", 0x0, 32),
+        XBitField("reserved2", 0x0, 8),
+        XBitField("control", 0x0, 8),
+    ]
+
+
 bind_layers(CDB, COMPARE_AND_WRITE, opcode=0x89)
 bind_layers(CDB, INQUIRY, opcode=0x12)
 bind_layers(CDB, READ16, opcode=0x88)
@@ -748,3 +765,4 @@ bind_layers(CDB, PR_IN, opcode=0x5E)
 bind_layers(CDB, PR_OUT, opcode=0x5F)
 bind_layers(CDB, REQUEST_SENSE, opcode=0x03)
 bind_layers(CDB, UNMAP, opcode=0x42)
+bind_layers(CDB, RSOC, opcode=0xA3)
